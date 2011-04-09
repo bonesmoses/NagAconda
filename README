@@ -1,0 +1,13 @@
+Nagios has been around for quite some time, but producing output it can 
+consume is something of a black art. Only the plugin documentation 
+actually explains what all the extra semicolons or extended formatting 
+even means.
+
+This is especially onerous when performance consuming add-ons expect a 
+specific structure before operating properly. This package strives to 
+greatly simplify the process of actually generating Nagios output using 
+Python.
+
+Please see the TODO file for a very rudimentary roadmap for this
+project! Development should pick up after the move to github thanks
+to the increase in volunteers.
