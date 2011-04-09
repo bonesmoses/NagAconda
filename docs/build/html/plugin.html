@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>NagAconda – Python Nagios Integration &mdash; NagAconda v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="NagAconda v1.0 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to NagAconda’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to NagAconda’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">NagAconda v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <p id="module-NagAconda"><em>Platforms: </em>Unix</p>
+<div class="section" id="module-NagAconda.Plugin">
+<h1><tt class="xref docutils literal"><span class="pre">NagAconda</span></tt> &#8211; Python Nagios Integration<a class="headerlink" href="#module-NagAconda.Plugin" title="Permalink to this headline">¶</a></h1>
+<p>Nagios has been around for quite some time, but producing output it can
+consume is something of a black art. Only the plugin documentation actually
+explains what all the extra semicolons or extended formatting even means.</p>
+<p>This is especially onerous when performance consuming add-ons expect a
+specific structure before operating properly. This package strives to
+greatly simplify the process of actually generating Nagios output.</p>
+<div class="section" id="module-Plugin">
+<h2><tt class="xref docutils literal"><span class="pre">Plugin</span></tt> &#8211; Nagios Plugin Wrapper<a class="headerlink" href="#module-Plugin" title="Permalink to this headline">¶</a></h2>
+<p><em>Platforms: </em>Unix</p>
+<p>The Plugin module provides all the parts necessary to create a simple Nagios
+report for a service or host check by removing all that pesky inside
+knowledge necessary.  All the classes and methods provided here reduce plugin
+creation to a few lines of python unless the plugin is especially complex.</p>
+<p>All specifications for this module are obtained from the <a class="reference external" href="http://nagiosplug.sourceforge.net/developer-guidelines.html">Nagios developer
+documentation</a>.</p>
+<div class="section" id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">NagAconda</span> <span class="kn">import</span> <span class="n">Plugin</span>
+<span class="kn">from</span> <span class="nn">Person</span> <span class="kn">import</span> <span class="n">Dude</span>
+
+<span class="n">feet</span> <span class="o">=</span> <span class="n">Plugin</span><span class="p">(</span><span class="s">&quot;Plugin to quantify current foot odor.&quot;</span><span class="p">,</span> <span class="s">&quot;1.0&quot;</span><span class="p">)</span>
+<span class="n">feet</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;t&#39;</span><span class="p">,</span> <span class="s">&#39;target&#39;</span><span class="p">,</span> <span class="s">&#39;Person to check for odor.&#39;</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">feet</span><span class="o">.</span><span class="n">enable_status</span><span class="p">(</span><span class="s">&#39;warning&#39;</span><span class="p">)</span>
+<span class="n">feet</span><span class="o">.</span><span class="n">enable_status</span><span class="p">(</span><span class="s">&#39;critical&#39;</span><span class="p">)</span>
+<span class="n">feet</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="n">roommate</span> <span class="o">=</span> <span class="n">Dude</span><span class="p">(</span><span class="n">feet</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+<span class="n">feet</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&#39;stench&#39;</span><span class="p">,</span> <span class="n">rommmate</span><span class="o">.</span><span class="n">gym_socks</span><span class="p">())</span>
+
+<span class="n">feet</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="api-specification">
+<h3>API Specification<a class="headerlink" href="#api-specification" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="NagAconda.Plugin">
+<em class="property">
+class </em><tt class="descclassname">NagAconda.</tt><tt class="descname">Plugin</tt><big>(</big><em>description</em>, <em>version</em><big>)</big><a class="headerlink" href="#NagAconda.Plugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the primary control class for NagAconda.</p>
+<p>The attributes available here are direct-access to parsed options and
+arguments, not class-level variables.</p>
+<dl class="attribute">
+<dt id="Plugin.Plugin.options">
+<tt class="descname">options</tt><a class="headerlink" href="#Plugin.Plugin.options" title="Permalink to this definition">¶</a></dt>
+<dd>This contains all of the options obtained from the command line for this
+plugin. This includes any options registered by the master class.</dd></dl>
+
+<dl class="attribute">
+<dt id="Plugin.Plugin.arguments">
+<tt class="descname">arguments</tt><a class="headerlink" href="#Plugin.Plugin.arguments" title="Permalink to this definition">¶</a></dt>
+<dd>After <cite>start</cite> is called, all command-line options are read, and anything
+left over is placed into this object for further use. Most Nagios
+parsers use explicit option setting, so you might never use this.</dd></dl>
+
+<dl class="method">
+<dt id="NagAconda.Plugin.add_option">
+<tt class="descname">add_option</tt><big>(</big><em>flag</em>, <em>name</em>, <em>helptext</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#NagAconda.Plugin.add_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a Nagios-style help option to this plugin.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>flag</em> &#8211; A one-letter shortcut for this option.</li>
+<li><em>name</em> &#8211; The full name for this option.</li>
+<li><em>helptext</em> &#8211; Instructions for usage of this option.</li>
+<li><em>required</em> (True or False) &#8211; Force option for plugin execution. Default False.</li>
+<li><em>action</em> (Setting string. Default &#8216;store&#8217;) &#8211; What type of storage action should take place for
+this parameter? This is the same as the OptionParser &#8216;action&#8217;
+setting. Default is &#8216;store&#8217;.</li>
+<li><em>callback</em> (function reference or None) &#8211; When action is <cite>callback</cite>, use specified function.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="NagAconda.Plugin.enable_status">
+<tt class="descname">enable_status</tt><big>(</big><em>status_type</em>, <em>required=False</em><big>)</big><a class="headerlink" href="#NagAconda.Plugin.enable_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable warning or critical exit statuses.</p>
+<p>Nagios requires error levels to be returned by the running
+application to evaluate exit status since the text is indeterminate.
+For Nagios:</p>
+<blockquote>
+<ul class="simple">
+<li>0 - Status OK</li>
+<li>1 - Plugin is notifying a warning state.</li>
+<li>2 - Plugin is notifying of a critical error or state.</li>
+<li>3 - Some unknown or unhandled error occurred.</li>
+<li>other - Nagios will report this as a plugin failure.</li>
+</ul>
+</blockquote>
+<p>By default, warnings and critical errors are not enabled, in case the
+plugin is just tracking values. This method will turn them on and add
+the proper command-line elements so the user can set them.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If <strong>warning</strong> or <strong>critical</strong> is enabled, failing to provide them
+to the plugin will result in an automatic exit and presentation of
+the usage documentation.</p>
+</div>
+<p>When plugins make use of multiple performance metrics, they may also
+have different scales, and hence warning/critical ranges involved.
+In this case, ranges must be passed by the command-line in
+comma-delimited format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>status_type</em> &#8211; Should be either <cite>warning</cite> or <cite>critical</cite>.</li>
+<li><em>required</em> (True or False. Default False.) &#8211; Should this threshold be a required option?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="NagAconda.Plugin.finish">
+<tt class="descname">finish</tt><big>(</big><big>)</big><a class="headerlink" href="#NagAconda.Plugin.finish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the proper warning/errors and prints out all results.</p>
+<p>Once all values have been set through ordinary means, it remains to
+check them against our warning/critical status ranges if necessary
+and output all our wonderful results so Nagios can consume them.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="NagAconda.Plugin.set_value">
+<tt class="descname">set_value</tt><big>(</big><em>name</em>, <em>val</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#NagAconda.Plugin.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a performance measurement for output to Nagios.</p>
+<p>There is theoretically no limit on the number of metrics being tracked
+in Nagios performance output. That said, we strongly recommend reading
+the Nagios developer docs to understand how warning and critical test
+ranges are handled.</p>
+<p>Should a minimum or maximum value be provided here, they will only
+be used to build percentage ranges, and will not otherwise affect
+operation of Nagios.</p>
+<p>This should always be called <em>after</em> the <strong>start</strong> method.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Any value parameter that is not submitted as an numeric type will be
+converted to one so tests work properly.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><em>name</em> &#8211; Name of the performance setting.</li>
+<li><em>val</em> (float or None) &#8211; Value observed for this iteration.</li>
+<li><em>lowest</em> (float or None) &#8211; Minimum possible value for this setting. Optional.</li>
+<li><em>highest</em> (float or None) &#8211; Maximum possible value for this setting. Optional.</li>
+<li><em>scale</em> (string or None) &#8211; The unit of measurement to apply to this value.
+should be a byte measurement (B, KB, MB, GB, TB) or
+a unit of time (s, ms, us, ns), or a percentage (%).</li>
+<li><em>threshold</em> (integer, default 1) &#8211; Which warning/critical range to target for this
+value? Default 1, since most never use more.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name" colspan="2">Raises ValueError:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body"><p class="first">When an invalid scale is passed.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns string:</th><td class="field-body"><p class="first last">One of &#8216;ok&#8217;, &#8216;warning&#8217; or &#8216;critical&#8217;, as to how this
+value compared to the enabled and supplied thresholds.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="NagAconda.Plugin.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="headerlink" href="#NagAconda.Plugin.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invokes all preparation steps to retrieve host/service status.</p>
+<p>Starts the actual plugin&#8217;s work. The Plugin class will start by
+parsing any options so the whole process can short-circuit before
+we do anything important.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method may exit directly to the console.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">NagAconda</span></tt> &#8211; Python Nagios Integration</a><ul>
+<li><a class="reference external" href="#module-Plugin"><tt class="docutils literal"><span class="pre">Plugin</span></tt> &#8211; Nagios Plugin Wrapper</a><ul>
+<li><a class="reference external" href="#usage">Usage</a></li>
+<li><a class="reference external" href="#api-specification">API Specification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">Welcome to NagAconda&#8217;s documentation!</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/plugin.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to NagAconda’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">NagAconda v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Shaun Thomas.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

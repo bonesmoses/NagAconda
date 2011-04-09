@@ -1,0 +1,21 @@
+0.1.4
+
+- Minor documentation fixes.
+
+0.1.3
+
+- Added 'set_status_message' method to enhance human readability in generated
+  output beyond OK, WARNING, or CRITICAL.
+- Added 'unknown_error' method to give plugin abortive quit capability and
+  avoid polluting 'finish' with similar functionality.
+- All internal assertions now exit gracefully with 'unknown_error'.
+
+0.1.2
+
+- Fixed a problem that was breaking the lower-bound for negative infinity
+  in warning and critical thresholds.
+- Added 'default' to option attributes passed to OptionParser.
+
+0.1.1
+
+- Initial Release

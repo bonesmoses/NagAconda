@@ -1,0 +1,14 @@
+# Sphinx inventory version 1
+# Project: NagAconda
+# Version: 1.0
+NagAconda mod plugin.html
+Plugin mod plugin.html
+NagAconda.Plugin mod plugin.html
+NagAconda.Plugin.finish method plugin.html
+Plugin.Plugin.arguments attribute plugin.html
+NagAconda.Plugin.start method plugin.html
+NagAconda.Plugin.set_value method plugin.html
+NagAconda.Plugin class plugin.html
+NagAconda.Plugin.add_option method plugin.html
+Plugin.Plugin.options attribute plugin.html
+NagAconda.Plugin.enable_status method plugin.html

@@ -1,0 +1,10 @@
+* Fix warning / critical bug.
+  - All matches should be inclusive.
+  - @ actually inverts the match.
+* Add ability to set warning / critical level through API call.
+* Add class for Network-enabled scripts
+  - Should reserve '-H' for host.
+  - Should reserve '-p' for port.
+  - etc.
+* Add class for Database-enabled scripts
+  - As with network script, reserve database-related parameters.

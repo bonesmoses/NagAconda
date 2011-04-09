@@ -1,0 +1,36 @@
+Metadata-Version: 1.0
+Name: NagAconda
+Version: 0.1.4
+Summary: NagAconda is a Python Nagios wrapper.
+Home-page: http://www.leapfrogonline.com/
+Author: Shaun Thomas
+Author-email: sthomas@leapfrogonline.com
+License: New BSD License
+Description: 
+        :mod:`NagAconda` -- Python Nagios Integration
+        =============================================
+        
+        Nagios has been around for quite some time, but producing output it can
+        consume is something of a black art. Only the plugin documentation actually
+        explains what all the extra semicolons or extended formatting even means.
+        
+        This is especially onerous when performance consuming add-ons expect a
+        specific structure before operating properly. This package strives to
+        greatly simplify the process of actually generating Nagios output.
+        
+        .. automodule:: NagAconda.Plugin
+        
+        
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Documentation
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: System :: Monitoring
+Classifier: Topic :: System :: Systems Administration
+Classifier: Topic :: Utilities
