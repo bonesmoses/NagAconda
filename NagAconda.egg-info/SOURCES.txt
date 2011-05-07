@@ -1,6 +1,7 @@
 CHANGELOG
 LICENSE
 MANIFEST.in
+README
 setup.cfg
 setup.py
 NagAconda/Plugin.py
