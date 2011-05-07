@@ -1,3 +1,7 @@
+0.2.0
+- Fixed the @ symbol to properly invert threshold matches
+- Added ability to internally set Warning and Critical thresholds
+
 0.1.4
 
 - Minor documentation fixes.

@@ -41,12 +41,12 @@ API Specification
 -----------------
 
 .. autoclass:: NagAconda.Plugin
-   :members: add_option, enable_status, finish, set_value, set_status_message,
-             start, unknown_error
+   :members: add_option, enable_status, force_status, finish, set_value,
+             set_status_message, start, unknown_error
 
 """
 
-__version__ = '0.1.4'
+__version__ = '0.2.0'
 __all__ = ['Plugin']
 
 # We need the option parser primarily to provide an instruction harness to the
@@ -103,6 +103,8 @@ class Plugin:
         self.__started = False     # Has 'start' been called yet?
         self.__exit_status = None  # 'ok', 'warning', or 'critical'.
         self.__exit_message = None # User specified status, filtered.
+        self.__warning = []        # Array of warning ranges.
+        self.__critical = []       # Array of critical ranges.
 
         # With our variables out of the way, let's start up the option parser
         # with a version and verbose setting, along with a sane usage
@@ -135,8 +137,17 @@ class Plugin:
             threshold necessary to test the targeted variable.
 
         """
-        range_list = getattr(self.options, range_type)
-        if not range_list:
+
+        # Before we really do anything, make sure a warning or critical 
+        # threshold were even set.
+
+        print 'range was ' + range_type
+
+        range_list = self.__warning
+        if range_type == 'critical':
+            range_list = self.__critical
+
+        if len(range_list) < 1:
             return
 
         threshold = self.__perf[name]['threshold']
@@ -154,17 +165,17 @@ class Plugin:
                 threshold, range_type))
 
         # The option parser should have already split these into proper
-        # bottom, top, inclusive, so long as the array element is defined.
-        # Perform our range test and set the exit status.
+        # bottom, top, and match inversion, so long as the array element
+        # is defined Perform our range test and set the exit status.
+        print range_list[threshold-1]
+        (bottom, top, invert) = range_list[threshold-1]
 
-        (bottom, top, inclusive) = range_list[threshold-1]
-
-        if inclusive and val >= bottom and val <= top:
+        if ((not invert and (val < bottom or val > top)) or
+           (invert and val >= bottom and val <= top)):
             self.__exit_status = range_type
             self.__perf[name]['state'] = range_type
-        elif not inclusive and val > bottom and val < top:
-            self.__exit_status = range_type
-            self.__perf[name]['state'] = range_type
+
+        print "%s:%s:%s =  %s" % (val, bottom, top, ((val < bottom) or (val > top)))
 
     def add_option(self, flag, name, helptext, **kwargs):
         """
@@ -290,6 +301,70 @@ class Plugin:
         print 'Status ' + exit_status + perf_string
         sys.exit(exit_value)
 
+    def set_range(self, range_type, range_end, range_start=0,
+                 range_num=1, invert=False):
+        """
+        Manually set certain warning or critical exit statuses.
+
+        This function allows the plugin author to set warning or critical
+        thresholds without getting them from the command line. In fact, if
+        called after the 'start' method, it can override user parameters.
+
+        The 'end' parameter is the only required element, as per the Nagios
+        plugin API. However, if set, these rules apply:
+
+        1. value < start || value > end, trigger error
+        2. If inverted, start <= value <= end, trigger error
+
+        As the python language gives direct access to various numeric values,
+        use -infinity instead of '~' described by the Nagios API.
+
+        :param range_type: Should be either `warning` or `critical`.
+        :type range_type: String.
+        :param range_end: Values > this should trigger a range error.
+        :type range_end: Number
+        :param range_start: Values < this should trigger a range error.
+        :type range_start: Number, default 0.
+        :param range_num: Set to use multiple ranges, one per range.
+        :type range_num: Integer, default 1.
+        :param invert: Set to True to throw errors inside the range.
+        :type range_num: Boolean, default False.
+        """
+        try:
+            range_type = range_type.lower()
+            assert range_type in ('warning', 'critical')
+        except (AttributeError, AssertionError):
+            self.unknown_error(
+                "Range type can only be one of *warning* or *critical*!")
+
+        try:
+            assert range_num > 0
+        except (AttributeError, AssertionError):
+            self.unknown_error("Range number must be 1 or greater!")
+
+        try:
+            my_range = self.__warning
+            if range_type == 'critical':
+                my_range = self.__critical
+
+            range_start = float(range_start)
+            range_end = float(range_end)
+
+            if range_num > len(my_range):
+                my_range.append((range_start, range_end, invert))
+            else:
+                my_range[range_num-1] = (range_start, range_end, invert)
+
+            if range_type == 'warning':
+                self.__warning = my_range
+            else:
+                self.__critical = my_range
+
+        except (IndexError):
+            self.unknown_error(
+                "All ranges between 1 and %d must be defined first!" %
+                range_num)
+
     def set_value(self, name, val, **kwargs):
         """
         Set a performance measurement for output to Nagios.
@@ -369,10 +444,12 @@ class Plugin:
         # We'll use the opportunity to check the status ranges right when the
         # variable is set so we don't have to loop through all of them later.
 
-        if hasattr(self.options, 'warning'):
+        if len(self.__warning) > 0:
+            print "checking warning"
             self.__check_range('warning', name)
 
-        if hasattr(self.options, 'critical'):
+        if len(self.__critical) > 0:
+            print "checking critical"
             self.__check_range('critical', name)
 
         return self.__perf[name]['state']
@@ -435,6 +512,15 @@ class Plugin:
                 self.__opt_parser.error("Required option '%s' not set!" %
                     opt_name)
 
+        # Capture warning and critical thresholds if there were any.
+        # These can be overridden by API calls.
+
+        if hasattr(self.options, 'warning'):
+            self.__warning = getattr(self.options, 'warning')
+
+        if hasattr(self.options, 'critical'):
+            self.__critical = getattr(self.options, 'critical')
+
         self.__started = True
         self.__exit_status = 'OK'
 
@@ -465,9 +551,8 @@ def convert_range(option, opt_str, value, parser):
     """
     Convert a warning/critical range into separate testable variables.
 
-    Nagios warning or critical status tests are actually ranges with
-    some weird rules. See the developer documentation to see them all,
-    but rest assured we've implemented *all* of them.
+    This is separated from the Plugin classe to act as a callback for the
+    optparse class.
 
     :param values: All values currently parsed by OptionParser. We'll
         be adding 'dest' to the pile or extending its values.
@@ -478,46 +563,70 @@ def convert_range(option, opt_str, value, parser):
 
     """
     # Preserve the original option string for print output.
+
     parser.values.ensure_value("raw_%s" % option.dest, value)
 
+    # Place the max and min into a single entry for each found
+    # threshold. This lets a user see all possible ranges passed by
+    # the user, and select a set based on specification order.
+
     for part in value.split(','):
+        parser.values.ensure_value(option.dest, []).append(get_range(part))
 
-        # If we find a '@' at the beginning of the range, it's inclusive
+def get_range(value):
+    """
+    Find the max/min ranges for a Nagios range comparison.
 
-        inclusive = False
+    Nagios handles ranges by accepting them as strings. The curent rules
+    according to the API assume [@]start:end and include:
 
-        if part.find('@') == 0:
-            inclusive = True
-            part = part.lstrip('@')
+    * If start is empty, start is 0.
+    * If start is ~, start is -infinity.
+    * Alert if value is <= start, or >= end.
+    * If prepended with @, alert if value is between start and end.
 
-        # The : separates a max/min range. If it exists, there is at least
-        # a minimum. We'll start our ranges at infinity so we don't have to
-        # worry about complex testing logic.
+    The fact 0 and : are optional make it somewhat confusing and counter-
+    intuitive; most plugin authors don't know that <= 0 should trigger alerts.
 
-        bottom = -float('infinity')
-        top = float('infinity')
+    :param value: Nagios-compatible range string to parse.
 
-        if part.find(':') > 0:
-            (bottom, top) = part.split(':')
-            if top == '':
-                top = float('infinity')
-            else:
-                top = float(top)
+    :return list: A single list with three elements representing the min and
+        max boundaries for the range, and whether or not to invert the match.
+    """
 
-            if bottom == '~':
-                bottom = -float('infinity')
-            else:
-                bottom = float(bottom)
+    # If we find a '@' at the beginning of the range, we should invert
+    # the match.
+
+    invert = False
+
+    if value.find('@') == 0:
+        invert = True
+        value = value.lstrip('@')
+
+    # The : separates a max/min range. If it exists, there is at least
+    # a minimum. We'll start our ranges at zero and infinity so we don't
+    # have to worry about complex testing logic.
+
+    bottom = 0
+    top = float('infinity')
+
+    if value.find(':') > 0:
+        (bottom, top) = value.split(':')
+        if top == '':
+            top = float('infinity')
         else:
-            bottom = float(part)
+            top = float(top)
 
-        # Place bottom, top, and inclusive into a single entry for each found
-        # threshold. This lets a user see all possible ranges passed by the
-        # user, and select a set based on specification order.
+        if bottom == '':
+            bottom = 0
+        elif bottom == '~':
+            bottom = -float('infinity')
+        else:
+            bottom = float(bottom)
+    else:
+        top = float(value)
 
-        parser.values.ensure_value(option.dest, []).append([bottom,
-            top, inclusive])
-
+    return (bottom, top, invert)
 
 if __name__ == "__main__":
     PLUGTEST = Plugin()

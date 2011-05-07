@@ -29,23 +29,25 @@ class TestRanges(PlugTest):
         self.plugin.start()
 
         expected = {7: 'ok', 10: 'ok', 12: 'warning',
-                    15: 'warning', 16: 'critical'}
+                    15: 'warning', 17: 'critical'}
 
         for (t_val, t_status) in expected.items():
             assert self.plugin.set_value('test', t_val) == t_status
 
-    def test_inclusive_threshold(self):
+    def test_inverted_threshold(self):
         """
-        Test a couple inclusive thresholds for state change.
+        Test a couple inverted thresholds for state change.
 
         """
         self.plugin.enable_status('warning', True)
         self.plugin.enable_status('critical', True)
-        sys.argv.extend(['-w', '@10'])
-        sys.argv.extend(['-c', '@15'])
+        sys.argv.extend(['-w', '@5:10'])
+        sys.argv.extend(['-c', '@15:20'])
         self.plugin.start()
 
-        expected = {7: 'ok', 10: 'warning', 20: 'critical'}
+        expected = {3: 'ok', 5: 'warning', 7: 'warning', 10: 'warning',
+                    12: 'ok', 15: 'critical', 17: 'critical',
+                    20: 'critical', 22: 'ok'}
 
         for (t_val, t_status) in expected.items():
             assert self.plugin.set_value('test', t_val) == t_status
@@ -56,12 +58,11 @@ class TestRanges(PlugTest):
 
         """
         self.plugin.enable_status('warning', True)
-        self.plugin.enable_status('critical', True)
         sys.argv.extend(['-w', '10:15'])
-        sys.argv.extend(['-c', '20:25'])
         self.plugin.start()
 
-        expected = {7: 'ok', 12: 'warning', 16: 'ok', 21: 'critical', 26: 'ok'}
+        expected = {5: 'warning', 10: 'ok', 12: 'ok', 15: 'ok',
+                    17: 'warning'}
 
         for (t_val, t_status) in expected.items():
             assert self.plugin.set_value('test', t_val) == t_status
@@ -78,4 +79,21 @@ class TestRanges(PlugTest):
         assert self.plugin.set_value('test', 12, threshold=1) == 'warning'
         assert self.plugin.set_value('test', 12, threshold=2) == 'ok'
         assert self.plugin.set_value('test', 16, threshold=2) == 'warning'
+
+    def test_manual_range(self):
+        """
+        Test a simple set of manually defined thresholds for state change.
+
+        """
+        self.plugin.set_range('warning', 10)
+        self.plugin.set_range('critical', 15)
+        self.plugin.start()
+
+        expected = {7: 'ok', 10: 'ok', 12: 'warning',
+                    15: 'warning', 17: 'critical' }
+
+        for (t_val, t_status) in expected.items():
+            print "Testing %s for %s" % (t_val, t_status)
+            assert self.plugin.set_value('test', t_val) == t_status
+
 
