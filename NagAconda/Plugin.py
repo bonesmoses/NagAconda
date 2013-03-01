@@ -5,7 +5,7 @@
 .. module:: Plugin
    :platform: Unix
    :synopsis: Wraps Nagios plugins in a candy coating.
-.. moduleauthor:: Shaun Thomas <sthomas@leapfrogonline.com>
+.. moduleauthor:: Shaun Thomas <shaun@bonesmoses.org>
 
 The Plugin module provides all the parts necessary to create a simple Nagios
 report for a service or host check by removing all that pesky inside
@@ -41,12 +41,12 @@ API Specification
 -----------------
 
 .. autoclass:: NagAconda.Plugin
-   :members: add_option, enable_status, force_status, finish, set_value,
+   :members: add_option, enable_status, finish, set_range, set_value,
              set_status_message, start, unknown_error
 
 """
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __all__ = ['Plugin']
 
 # We need the option parser primarily to provide an instruction harness to the
