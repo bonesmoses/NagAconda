@@ -1,3 +1,7 @@
+0.2.1
+- Documentation Fixes
+- Fixed issue with setup.py that prevented module registration.
+
 0.2.0
 - Fixed the @ symbol to properly invert threshold matches
 - Added ability to internally set Warning and Critical thresholds
