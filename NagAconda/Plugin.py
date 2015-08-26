@@ -291,7 +291,8 @@ class Plugin:
                 perf_name, perf_dict['val'], perf_dict['scale'] or '',
                 perf_dict.get('raw_warning', ''),
                 perf_dict.get('raw_critical', ''),
-                perf_dict['min'] or '', perf_dict['max'] or '')
+                '' if perf_dict['min'] is None else perf_dict['min'],
+                '' if perf_dict['max'] is None else perf_dict['max'])
             )
 
         perf_string = ''
