@@ -168,11 +168,12 @@ class Plugin:
         # bottom, top, and match inversion, so long as the array element
         # is defined Perform our range test and set the exit status.
         print range_list[threshold-1]
-        (bottom, top, invert) = range_list[threshold-1]
+        (bottom, top, invert, raw) = range_list[threshold-1]
+
+        self.__perf[name]["raw_%s" % range_type] = raw
 
         if ((not invert and (val < bottom or val > top)) or
            (invert and val >= bottom and val <= top)):
-            self.__exit_status = range_type
             self.__perf[name]['state'] = range_type
 
         print "%s:%s:%s =  %s" % (val, bottom, top, ((val < bottom) or (val > top)))
@@ -270,10 +271,13 @@ class Plugin:
             self.unknown_error("Start method must be called first!")
 
         exit_value = 0
-        if self.__exit_status == 'warning':
-            exit_value = 1
-        if self.__exit_status == 'critical':
-            exit_value = 2
+        for perf_dict in self.__perf.values():
+            if perf_dict['state'] == 'warning' and exit_value < 1:
+                exit_value = 1
+                self.__exit_status = 'warning'
+            elif perf_dict['state'] == 'critical' and exit_value < 2:
+                exit_value = 2
+                self.__exit_status = 'critical'
 
         # Nagios performance output is values delimited by a space. semicolons
         # separate to val;warn;crit;min;max with the scale included in all
@@ -285,8 +289,8 @@ class Plugin:
 
             perfs.append('%s=%s%s;%s;%s;%s;%s' % (
                 perf_name, perf_dict['val'], perf_dict['scale'] or '',
-                self.options.ensure_value('raw_warning', ''),
-                self.options.ensure_value('raw_critical', ''),
+                perf_dict.get('raw_warning', ''),
+                perf_dict.get('raw_critical', ''),
                 perf_dict['min'] or '', perf_dict['max'] or '')
             )
 
@@ -593,6 +597,7 @@ def get_range(value):
     :return list: A single list with three elements representing the min and
         max boundaries for the range, and whether or not to invert the match.
     """
+    raw = value
 
     # If we find a '@' at the beginning of the range, we should invert
     # the match.
@@ -626,7 +631,7 @@ def get_range(value):
     else:
         top = float(value)
 
-    return (bottom, top, invert)
+    return (bottom, top, invert, raw)
 
 if __name__ == "__main__":
     PLUGTEST = Plugin()
