@@ -141,7 +141,7 @@ class Plugin:
         # Before we really do anything, make sure a warning or critical 
         # threshold were even set.
 
-        print 'range was ' + range_type
+        self.__verbose_print('range was ' + range_type)
 
         range_list = self.__warning
         if range_type == 'critical':
@@ -167,7 +167,7 @@ class Plugin:
         # The option parser should have already split these into proper
         # bottom, top, and match inversion, so long as the array element
         # is defined Perform our range test and set the exit status.
-        print range_list[threshold-1]
+        self.__verbose_print(range_list[threshold-1])
         (bottom, top, invert, raw) = range_list[threshold-1]
 
         self.__perf[name]["raw_%s" % range_type] = raw
@@ -176,7 +176,7 @@ class Plugin:
            (invert and val >= bottom and val <= top)):
             self.__perf[name]['state'] = range_type
 
-        print "%s:%s:%s =  %s" % (val, bottom, top, ((val < bottom) or (val > top)))
+        self.__verbose_print("%s:%s:%s =  %s" % (val, bottom, top, ((val < bottom) or (val > top))))
 
     def add_option(self, flag, name, helptext, **kwargs):
         """
@@ -449,11 +449,11 @@ class Plugin:
         # variable is set so we don't have to loop through all of them later.
 
         if len(self.__warning) > 0:
-            print "checking warning"
+            self.__verbose_print("checking warning")
             self.__check_range('warning', name)
 
         if len(self.__critical) > 0:
-            print "checking critical"
+            self.__verbose_print("checking critical")
             self.__check_range('critical', name)
 
         return self.__perf[name]['state']
@@ -550,6 +550,12 @@ class Plugin:
         """
         print 'Status Unknown: ' + message
         sys.exit(3)
+
+    def __verbose_print(self, *args):
+        if self.options.verbose is not None:
+            for arg in args:
+                print arg,
+            print
 
 def convert_range(option, opt_str, value, parser):
     """
