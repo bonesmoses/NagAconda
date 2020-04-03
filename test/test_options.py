@@ -27,8 +27,8 @@ class TestOptions(PlugTest):
 
         try:
             self.plugin.start()
-        except SystemExit, e:
-            print dir(e)
+        except SystemExit as e:
+            print(dir(e))
             assert True
         else:
             assert False

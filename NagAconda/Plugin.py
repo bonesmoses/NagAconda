@@ -201,7 +201,7 @@ class Plugin:
 
         opt_usage = "-%s %s" % (flag, name.upper())
 
-        if kwargs.has_key('required') and kwargs['required'] is True:
+        if 'required' in kwargs and kwargs['required'] is True:
             self.__req_option.append(name)
         else:
             opt_usage = "[%s]" % opt_usage
@@ -303,7 +303,7 @@ class Plugin:
         if self.__exit_message is not None:
             exit_status += ', %s' % self.__exit_message
 
-        print 'Status ' + exit_status + perf_string
+        print('Status ' + exit_status + perf_string)
         sys.exit(exit_value)
 
     def set_range(self, range_type, range_end, range_start=0,
@@ -420,20 +420,20 @@ class Plugin:
         val_dict = {'val': val, 'min': None, 'max': None, 'scale': None,
             'threshold': 1, 'state': 'ok'}
 
-        if kwargs.has_key('lowest'):
+        if 'lowest' in kwargs:
             val_dict['min'] = float(kwargs.get('lowest'))
 
-        if kwargs.has_key('highest'):
+        if 'highest' in kwargs:
             val_dict['max'] = float(kwargs.get('highest'))
 
-        if kwargs.has_key('threshold'):
+        if 'threshold' in kwargs:
             val_dict['threshold'] = kwargs['threshold']
 
         # Nagios actually understands most byte and time oriented scales.
         # The developer docs also list a counter scale, but we're not certain
         # if any plugin has ever used that. Only accept known scales.
 
-        if kwargs.has_key('scale'):
+        if 'scale' in kwargs:
             scale = kwargs.get('scale')
 
             if scale.upper() in ('B', 'KB', 'MB', 'GB', 'TB'):
@@ -549,7 +549,7 @@ class Plugin:
         :type message: string
 
         """
-        print 'Status Unknown: ' + message
+        print('Status Unknown: ' + message)
         sys.exit(3)
 
     def __verbose_print(self, *args):

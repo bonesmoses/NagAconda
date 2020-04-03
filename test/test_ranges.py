@@ -93,7 +93,7 @@ class TestRanges(PlugTest):
                     15: 'warning', 17: 'critical' }
 
         for (t_val, t_status) in expected.items():
-            print "Testing %s for %s" % (t_val, t_status)
+            print("Testing %s for %s" % (t_val, t_status))
             assert self.plugin.set_value('test', t_val) == t_status
 
 
