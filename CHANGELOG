@@ -1,3 +1,10 @@
+0.3.5
+- Added function __verbose_print back to the code from another PR
+- Added dynamic module import for using python2.7 or python3.8
+
+0.3.4
+- Added license things to relate to the original author Shaun Thomas
+
 0.3.3
 - Fixed various errors when using pip for installation of these module
 

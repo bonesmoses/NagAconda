@@ -10,11 +10,15 @@ This is especially onerous when performance consuming add-ons expect a
 specific structure before operating properly. This package strives to
 greatly simplify the process of actually generating Nagios output.
 
-.. automodule:: NagAconda.Plugin
+.. automodule:: NagAconda.plugin
 
 """
 
-__version__ = "0.3.3"
+__version__ = "0.3.5"
 
-from NagAconda import Plugin
+import sys
+if sys.version_info[0] > 2:
+    from .Plugin import Plugin
+else:
+    from Plugin import Plugin
 

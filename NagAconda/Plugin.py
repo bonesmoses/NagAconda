@@ -50,7 +50,7 @@ API Specification
 
 """
 
-__version__ = '0.3.3'
+__version__ = '0.3.5'
 __all__ = ['Plugin']
 
 # We need the option parser primarily to provide an instruction harness to the
@@ -145,7 +145,7 @@ class Plugin:
         # Before we really do anything, make sure a warning or critical 
         # threshold were even set.
 
-        print('range was ' + range_type)
+        self.__verbose_print('range was ' + range_type)
 
         range_list = self.__warning
         if range_type == 'critical':
@@ -169,15 +169,18 @@ class Plugin:
         # The option parser should have already split these into proper
         # bottom, top, and match inversion, so long as the array element
         # is defined Perform our range test and set the exit status.
-        print(range_list[threshold-1])
-        (bottom, top, invert) = range_list[threshold-1]
+
+        self.__verbose_print(range_list[threshold-1])
+        (bottom, top, invert, raw) = range_list[threshold-1]
+
+        self.__perf[name]["raw_%s" % range_type] = raw
 
         if ((not invert and (val < bottom or val > top)) or
            (invert and val >= bottom and val <= top)):
             self.__exit_status = range_type
             self.__perf[name]['state'] = range_type
 
-        print("%s:%s:%s =  %s" % (val, bottom, top, ((val < bottom) or (val > top))))
+        self.__verbose_print("%s:%s:%s =  %s" % (val, bottom, top, ((val < bottom) or (val > top))))
 
     def add_option(self, flag, name, helptext, **kwargs):
         """
@@ -272,10 +275,13 @@ class Plugin:
             self.unknown_error("Start method must be called first!")
 
         exit_value = 0
-        if self.__exit_status == 'warning':
-            exit_value = 1
-        if self.__exit_status == 'critical':
-            exit_value = 2
+        for perf_dict in self.__perf.values():
+            if perf_dict['state'] == 'warning' and exit_value < 1:
+                exit_value = 1
+                self.__exit_status = 'warning'
+            elif perf_dict['state'] == 'critical' and exit_value < 2:
+                exit_value = 2
+                self.__exit_status = 'critical'
 
         # Nagios performance output is values delimited by a space. semicolons
         # separate to val;warn;crit;min;max with the scale included in all
@@ -287,9 +293,10 @@ class Plugin:
 
             perfs.append('%s=%s%s;%s;%s;%s;%s' % (
                 perf_name, perf_dict['val'], perf_dict['scale'] or '',
-                self.options.ensure_value('raw_warning', ''),
-                self.options.ensure_value('raw_critical', ''),
-                perf_dict['min'] or '', perf_dict['max'] or '')
+                perf_dict.get('raw_warning', ''),
+                perf_dict.get('raw_critical', ''),
+                '' if perf_dict['min'] is None else perf_dict['min'],
+                '' if perf_dict['max'] is None else perf_dict['max'])
             )
 
         perf_string = ''
@@ -447,11 +454,11 @@ class Plugin:
         # variable is set so we don't have to loop through all of them later.
 
         if len(self.__warning) > 0:
-            print("checking warning")
+            self.__verbose_print("checking warning")
             self.__check_range('warning', name)
 
         if len(self.__critical) > 0:
-            print("checking critical")
+            self.__verbose_print("checking critical")
             self.__check_range('critical', name)
 
         return self.__perf[name]['state']
@@ -549,6 +556,12 @@ class Plugin:
         print('Status Unknown: ' + message)
         sys.exit(3)
 
+    def __verbose_print(self, *args):
+        if self.options.verbose is not None:
+            for arg in args:
+                print arg,
+            print
+
 def convert_range(option, opt_str, value, parser):
     """
     Convert a warning/critical range into separate testable variables.
@@ -596,6 +609,8 @@ def get_range(value):
         max boundaries for the range, and whether or not to invert the match.
     """
 
+    raw = value
+
     # If we find a '@' at the beginning of the range, we should invert
     # the match.
 
@@ -628,7 +643,7 @@ def get_range(value):
     else:
         top = float(value)
 
-    return (bottom, top, invert)
+    return (bottom, top, invert, raw)
 
 if __name__ == "__main__":
     PLUGTEST = Plugin()
