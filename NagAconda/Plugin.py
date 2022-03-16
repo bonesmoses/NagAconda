@@ -559,7 +559,7 @@ class Plugin:
     def __verbose_print(self, *args):
         if self.options.verbose is not None:
             for arg in args:
-                print arg,
+                print(arg),
             print
 
 def convert_range(option, opt_str, value, parser):
