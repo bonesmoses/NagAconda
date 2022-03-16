@@ -5,7 +5,7 @@
 .. module:: Plugin
    :platform: Unix
    :synopsis: Wraps Nagios plugins in a candy coating.
-.. moduleauthor:: Shaun Thomas <shaun@bonesmoses.org>
+.. moduleauthor:: Steven Schlegel <steven@schlegel.tech>
 
 The Plugin module provides all the parts necessary to create a simple Nagios
 report for a service or host check by removing all that pesky inside
@@ -14,6 +14,10 @@ creation to a few lines of python unless the plugin is especially complex.
 
 All specifications for this module are obtained from the `Nagios developer
 documentation <http://nagiosplug.sourceforge.net/developer-guidelines.html>`_.
+
+Author (Original): Shaun Thomas
+Vendor (Original): Leapfrog Online
+Source (Original): https://github.com/bonesmoses/NagAconda
 
 Usage
 -----
@@ -46,7 +50,7 @@ API Specification
 
 """
 
-__version__ = '0.2.1'
+__version__ = '0.3.5'
 __all__ = ['Plugin']
 
 # We need the option parser primarily to provide an instruction harness to the
@@ -160,13 +164,12 @@ class Plugin:
         if len(range_list) < threshold:
             if range_type not in self.__req_option:
                 return
-            raise UserWarning, (
-                "Please set part %s of the %s threshold!" % (
-                threshold, range_type))
+            raise UserWarning ("Please set part %s of the %s threshold!" % (threshold, range_type))
 
         # The option parser should have already split these into proper
         # bottom, top, and match inversion, so long as the array element
         # is defined Perform our range test and set the exit status.
+
         self.__verbose_print(range_list[threshold-1])
         (bottom, top, invert, raw) = range_list[threshold-1]
 
@@ -174,6 +177,7 @@ class Plugin:
 
         if ((not invert and (val < bottom or val > top)) or
            (invert and val >= bottom and val <= top)):
+            self.__exit_status = range_type
             self.__perf[name]['state'] = range_type
 
         self.__verbose_print("%s:%s:%s =  %s" % (val, bottom, top, ((val < bottom) or (val > top))))
@@ -555,7 +559,7 @@ class Plugin:
     def __verbose_print(self, *args):
         if self.options.verbose is not None:
             for arg in args:
-                print arg,
+                print(arg),
             print
 
 def convert_range(option, opt_str, value, parser):
@@ -604,6 +608,7 @@ def get_range(value):
     :return list: A single list with three elements representing the min and
         max boundaries for the range, and whether or not to invert the match.
     """
+
     raw = value
 
     # If we find a '@' at the beginning of the range, we should invert
