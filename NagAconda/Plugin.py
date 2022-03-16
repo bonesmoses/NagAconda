@@ -5,7 +5,7 @@
 .. module:: Plugin
    :platform: Unix
    :synopsis: Wraps Nagios plugins in a candy coating.
-.. moduleauthor:: Shaun Thomas <shaun@bonesmoses.org>
+.. moduleauthor:: Steven Schlegel <steven@schlegel.tech>
 
 The Plugin module provides all the parts necessary to create a simple Nagios
 report for a service or host check by removing all that pesky inside
@@ -14,6 +14,10 @@ creation to a few lines of python unless the plugin is especially complex.
 
 All specifications for this module are obtained from the `Nagios developer
 documentation <http://nagiosplug.sourceforge.net/developer-guidelines.html>`_.
+
+Author (Original): Shaun Thomas
+Vendor (Original): Leapfrog Online
+Source (Original): https://github.com/bonesmoses/NagAconda
 
 Usage
 -----
@@ -46,7 +50,7 @@ API Specification
 
 """
 
-__version__ = '0.3.1'
+__version__ = '0.3.3'
 __all__ = ['Plugin']
 
 # We need the option parser primarily to provide an instruction harness to the
