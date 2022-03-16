@@ -21,4 +21,3 @@ if sys.version_info[0] > 2:
     from .Plugin import Plugin
 else:
     from Plugin import Plugin
-

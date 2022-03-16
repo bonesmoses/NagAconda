@@ -30,7 +30,7 @@ class TestOperation(PlugTest):
             self.plugin.start()
             self.plugin.set_value('foo', 9)
             self.plugin.finish()
-        except SystemExit, e:
+        except SystemExit as e:
             assert e.code == 0
         else:
             assert False
@@ -49,7 +49,7 @@ class TestOperation(PlugTest):
             self.plugin.start()
             self.plugin.set_value('foo', 11)
             self.plugin.finish()
-        except SystemExit, e:
+        except SystemExit as e:
             assert e.code == 1
         else:
             assert False
@@ -70,7 +70,7 @@ class TestOperation(PlugTest):
             self.plugin.start()
             self.plugin.set_value('foo', 16)
             self.plugin.finish()
-        except SystemExit, e:
+        except SystemExit as e:
             assert e.code == 2
         else:
             assert False
@@ -85,7 +85,7 @@ class TestOperation(PlugTest):
         """
         try:
             self.plugin.unknown_error('Something Explodey happened')
-        except SystemExit, e:
+        except SystemExit as e:
             assert e.code == 3
         else:
             assert False
