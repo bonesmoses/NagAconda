@@ -1,3 +1,13 @@
+0.3.5
+- Added function __verbose_print back to the code from another PR
+- Added dynamic module import for using python2.7 or python3.8
+
+0.3.4
+- Added license things to relate to the original author Shaun Thomas
+
+0.3.3
+- Fixed various errors when using pip for installation of these module
+
 0.2.1
 - Documentation Fixes
 - Fixed issue with setup.py that prevented module registration.
@@ -7,11 +17,9 @@
 - Added ability to internally set Warning and Critical thresholds
 
 0.1.4
-
 - Minor documentation fixes.
 
 0.1.3
-
 - Added 'set_status_message' method to enhance human readability in generated
   output beyond OK, WARNING, or CRITICAL.
 - Added 'unknown_error' method to give plugin abortive quit capability and
@@ -19,11 +27,9 @@
 - All internal assertions now exit gracefully with 'unknown_error'.
 
 0.1.2
-
 - Fixed a problem that was breaking the lower-bound for negative infinity
   in warning and critical thresholds.
 - Added 'default' to option attributes passed to OptionParser.
 
 0.1.1
-
 - Initial Release
